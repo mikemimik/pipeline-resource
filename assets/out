@@ -1,0 +1,209 @@
+#! /usr/bin/env node
+'use strict';
+
+const readline = require('readline');
+const exec = require('child_process').execSync;
+const uuid = require('uuid/v4');
+const fs = require('fs');
+
+const read = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+let output;
+
+read.on('line', (input) => {
+  console.error(input);
+
+  /* INPUT:
+    {
+        "source": {
+            "target":"http://x.x.x.x:8080",
+            "teams":[
+                {
+                    "name": "prs",
+                    "username": "concourse",
+                    "password": "concourse"
+                }
+            ],
+        },
+        "params": {
+            "branch":"feature/CORE-10141-web-service_part_1",
+            "commit":"7eb6ed7acc39",
+            "pr_id":"701",
+            "updated_at":"1518622289000"
+        }
+    }
+  */
+  console.error('args:', process.argv);
+  const destination = process.argv[2];
+  const payload = JSON.parse(input);
+
+  // TESTING(mperrotte): listing out what's in the destination directory
+  const ls = fs.readdirSync(destination, 'utf8');
+  console.error('ls (destination):', ls);
+
+  // INFO(mperrotte): source values
+  const target = payload.source.target;
+  const teams = payload.source.teams;
+
+  // INFO(mperrotte): params values
+  const method = payload.params.method;
+  const configFile = payload.params.config_file;
+  const paramsFile = payload.params.params_file;
+  const name = payload.params.name;
+  const nameFile = payload.params.name_file;
+  let shouldStart = payload.params.should_start;
+  if (shouldStart === undefined) {
+    shouldStart = 'true';
+  }
+  const team = payload.params.team;
+  const currentTeam = teams.filter(t => t.name === team);
+
+  const username = currentTeam[0].username;
+  const password = currentTeam[0].password;
+
+  // NOTE(mperrotte): All validation for incoming props
+  const methods = [ 'create', 'remove', 'update' ];
+  if (!methods.includes(method)) {
+    console.error(method);
+    console.error('[params.method]: not.configured');
+    process.exit(1);
+  }
+  if (!currentTeam.length) {
+    console.error('[params.team]: not.in.[resource.teams]');
+    process.exit(1);
+  }
+  if (currentTeam.length > 1) {
+    console.error('[resource_type.teams]: duplicate.[resource.teams.name]');
+    process.exit(1);
+  }
+  if (!target) { console.error('[source.target]: not.configured'); process.exit(1); }
+  if (!method) { console.error('[params.method]: not.configured'); process.exit(1); }
+  if (!team) { console.error('[params.team]: not.configured'); process.exit(1); }
+  if (name && nameFile) {
+    console.error('[params.name]: duplicate.config.[params.name_file]');
+    process.exit(1);
+  }
+  if (!name && !nameFile) {
+    console.error('[params.name] OR [params.name_file]: not.configured');
+    process.exit(1);
+  }
+  if (shouldStart === undefined && method !== 'remove') {
+    console.error('[params.shouldStart]: not.configured');
+    process.exit(1);
+  }
+  if (!configFile && method !== 'remove') {
+    console.error('[params.configFile]: not.configured');
+    process.exit(1);
+  }
+  if (!paramsFile && method !== 'remove') {
+    console.error('[params.paramsFile]: not.configured');
+    process.exit(1);
+  }
+
+  // INFO(mperrotte): setting dynamic variables after validation has completed
+  const pipelineName = name || fs.readFileSync(`${destination}/${nameFile}`, 'utf8');
+
+  // INFO(mperrotte): try and log into concourse
+  const logs = login(target, username, password, team);
+  /**
+   * NOTE(mperrotte):
+   * The `login` command doesn't throw an error if the fly version is out of sync
+   * We just call `sync` anyways, each time
+   */
+  console.error('login logs:', logs);
+  if (logs) {
+    sync();
+    login(target, username, password, team);
+  }
+
+  switch (method) {
+    case 'create': {
+      const createPipeline = function () {
+        create(pipelineName, `${destination}/${configFile}`, `${destination}/${paramsFile}`);
+        expose(pipelineName);
+
+        if (shouldStart === 'true' || shouldStart === true) {
+          start(pipelineName);
+        }
+      };
+      const pipelines = list();
+      if (
+        !pipelines ||
+        (pipelines && !pipelines.includes(pipelineName))
+      ) {
+        // INFO(mperrotte): no pipelines created OR there are pipelines and this isn't one
+        createPipeline();
+      }
+      break;
+    }
+    case 'remove':
+      remove(pipelineName);
+      break;
+    case 'update':
+      break;
+    default:
+      console.error('method param unknown');
+      process.exit(1);
+  }
+
+  output = {
+    version: {
+      method,
+      name: pipelineName,
+      ref: uuid() // TODO(mperrotte): change this to commit data
+    },
+    metadata: [
+      { name: 'target', value: target },
+      { name: 'team', value: team },
+      { name: 'pipeline-name', value: pipelineName },
+      { name: 'shouldStart', value: shouldStart.toString() }
+    ]
+  };
+});
+
+read.on('close', () => {
+  console.log(JSON.stringify(output));
+  process.exit(0);
+});
+
+const execOptions = { encoding: 'utf8' };
+
+function login (target, username, password, team) {
+  const cmd = `fly -t local login -c ${target} -u ${username} -p ${password} -n ${team}`;
+  return exec(cmd, execOptions);
+}
+
+function sync () {
+  const cmd = `fly -t local sync`;
+  const result = exec(cmd, execOptions);
+  console.error(result);
+}
+
+function create (name, configFile, paramFile) {
+  const cmd = `fly -t local set-pipeline -p ${name} -c ${configFile} -l ${paramFile} -n`;
+  return exec(cmd, execOptions);
+}
+
+function list () {
+  const cmd = `fly -t local pipelines | awk '{ print $1 }'`;
+  return exec(cmd, execOptions).split('\n');
+}
+
+function remove (name) {
+  const cmd = `fly -t local destroy-pipeline -p ${name} -n`;
+  return exec(cmd, execOptions);
+}
+
+function start (name) {
+  const cmd = `fly -t local unpause-pipeline -p ${name}`;
+  return exec(cmd, execOptions);
+}
+
+function expose (name) {
+  const cmd = `fly -t local expose-pipeline -p ${name}`;
+  const result = exec(cmd, execOptions);
+  console.error(result);
+}
