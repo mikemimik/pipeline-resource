@@ -31,6 +31,8 @@ read.on('line', (input) => {
 });
 
 read.on('close', () => {
+  // TODO(mperrotte): return a list of all pipelines for a given team
+  // TODO(mperrotte): document that `- get: pipeline-resource` will need params
   console.log(JSON.stringify(output));
   process.exit(0);
 });
