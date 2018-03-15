@@ -15,27 +15,6 @@ let output;
 
 read.on('line', (input) => {
   console.error(input);
-
-  /* INPUT:
-    {
-        "source": {
-            "target":"http://x.x.x.x:8080",
-            "teams":[
-                {
-                    "name": "prs",
-                    "username": "concourse",
-                    "password": "concourse"
-                }
-            ],
-        },
-        "params": {
-            "branch":"feature/CORE-10141-web-service_part_1",
-            "commit":"7eb6ed7acc39",
-            "pr_id":"701",
-            "updated_at":"1518622289000"
-        }
-    }
-  */
   console.error('args:', process.argv);
   const destination = process.argv[2];
   const payload = JSON.parse(input);
