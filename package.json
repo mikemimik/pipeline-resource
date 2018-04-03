@@ -4,8 +4,13 @@
   "description": "pipeline resource for concourse",
   "scripts": {
     "build": "docker build --tag mperrotte/pipeline-resource .",
-    "push": "docker push mperrotte/pipeline-resource:latest",
-    "deploy": "npm run build && npm run push",
+    "tag:latest": "docker tag mperrotte/pipeline-resource mperrotte/pipeline-resource:latest",
+    "tag:version": "docker tag mperrotte/pipeline-resource:latest mperrotte/pipeline-resource:${npm_package_version}",
+    "tag": "npm run tag:latest && npm run tag:version",
+    "push:latest": "docker push mperrotte/pipeline-resource:latest",
+    "push:version": "docker push mperrotte/pipeline-resource:${npm_package_version}",
+    "push": "npm run push:latest && npm run push:version",
+    "deploy": "npm run build && npm run tag && npm run push",
     "test": "./build-test.sh"
   },
   "keywords": [
