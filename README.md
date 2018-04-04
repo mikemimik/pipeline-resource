@@ -17,12 +17,14 @@ It can create, update, and delete pipelines.
 
 ### Parameters
 * `method`: _Required_. The action to take (`create`, `update`, or `remove`).
-* `config_file`: _Required_. The path to a pipeline config yaml file.
-* `params_file`: _Required_. The path to the pipeline params yaml file. (Note: if no params file is needed, this must be a path to an empty file.)
+* `config_file`: _Optional_. The path to a pipeline config yaml file.
+* `params_file`: _Required_. The path to the pipeline params yaml file. (Note: if no params file is needed, then this parameter must explicitly be set to `false`.)
 * `should_start`: _Optional_. _Default `true`_
 #### Selection
-* `name`:
-* `name_file`:
+The `name` and `name_file` parameters are used to name and identify the pipeline. If you are creating a new pipeline this will become the name of the pipeline, or if you are updating/deleting a pipeline this parameter is used to identify the pipeline. You can not set both of these properties, it is either on or the other.
+
+* `name`: _Optional_. String name of the pipeline (no spaces allowed).
+* `name_file`: _Optional_. The path to a file containing the pipeline name (name in file can't contain any spaces).
 
 # Examples
 #### Resource Type:
