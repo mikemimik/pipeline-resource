@@ -4,7 +4,7 @@ This is a concourse resource that can interact with the current concourse instan
 It can create, update, and delete pipelines.
 
 # Source Configuration
-* `target`: _Required_.
+* `target`: _Required_. The `uri` to the concourse server. The same value you would pass to a `fly` command. (eg. `http://{ip-address/domain}:{port})
 * `teams`: _Required_. Array of `team` objects. Contains `name`, `username`, and `password` for the concourse team.
 
 # Behavior
