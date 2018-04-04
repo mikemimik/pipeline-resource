@@ -24,24 +24,25 @@ read.on('line', (input) => {
   console.error('ls (destination):', ls);
 
   // INFO(mperrotte): source values
-  const target = payload.source.target;
-  const teams = payload.source.teams;
+  const { target, teams } = payload.source;
 
   // INFO(mperrotte): params values
-  const method = payload.params.method;
-  const configFile = payload.params.config_file;
-  const paramsFile = payload.params.params_file;
-  const name = payload.params.name;
-  const nameFile = payload.params.name_file;
-  let shouldStart = payload.params.should_start;
-  if (shouldStart === undefined) {
-    shouldStart = 'true';
-  }
-  const team = payload.params.team;
+  const {
+    method,
+    configFile,
+    paramsFile,
+    name,
+    nameFile,
+    team
+  } = payload.params;
+
+  const shouldStart = (payload.params.should_start)
+    ? true
+    : (payload.params.should_start === undefined);
+
   const currentTeam = teams.filter(t => t.name === team);
 
-  const username = currentTeam[0].username;
-  const password = currentTeam[0].password;
+  const { username, password } = currentTeam[0];
 
   // NOTE(mperrotte): All validation for incoming props
   const methods = [ 'create', 'remove', 'update' ];
@@ -55,7 +56,7 @@ read.on('line', (input) => {
     process.exit(1);
   }
   if (currentTeam.length > 1) {
-    console.error('[resource_type.teams]: duplicate.[resource.teams.name]');
+    console.error('[resource.teams]: duplicate.[resource.teams.name]');
     process.exit(1);
   }
   if (!target) { console.error('[source.target]: not.configured'); process.exit(1); }
@@ -77,7 +78,7 @@ read.on('line', (input) => {
     console.error('[params.configFile]: not.configured');
     process.exit(1);
   }
-  if (!paramsFile && method !== 'remove') {
+  if (paramsFile === undefined && method !== 'remove') {
     console.error('[params.paramsFile]: not.configured');
     process.exit(1);
   }
