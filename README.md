@@ -89,11 +89,39 @@ plan:
         touch workspace/params.yml
         touch workspace/name
 - put: pipeline-generator
-    params:
-      method: create
-      should_start: true
-      team: prs
-      config_file: workspace/pipeline.yml
-      params_file: workspace/params.yml
-      name_file: workspace/name
+  params:
+    method: create
+    should_start: true
+    team: main
+    config_file: workspace/pipeline.yml
+    params_file: workspace/params.yml
+    name_file: workspace/name
+```
+
+```
+plan:
+- get: some-repo
+- task: generate-needed-files
+  config:
+    platform: linux
+    image_resource:
+      ...
+    inputs:
+    - name: some-repo
+    outputs:
+    - name: workspace
+    run:
+      path: sh
+      args:
+      - -exc
+      - |
+        cp some-repo/team/some-pipeline.yml workspace/some-pipeline.yml
+- put: pipeline-generator
+  params:
+    method: create
+    should_start: true
+    team: main
+    config_file: workspace/some-pipeline.yml
+    params_file: false
+    name: some-team-pipeline
 ```
