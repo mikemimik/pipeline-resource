@@ -1,6 +1,6 @@
 {
   "name": "pipeline-resource",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "pipeline resource for concourse",
   "scripts": {
     "build": "docker build --tag mperrotte/pipeline-resource .",
