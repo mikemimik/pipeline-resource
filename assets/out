@@ -159,7 +159,9 @@ function sync () {
 }
 
 function create (name, configFile, paramFile) {
-  const cmd = `fly -t local set-pipeline -p ${name} -c ${configFile} -l ${paramFile} -n`;
+  const cmd = (paramFile)
+    ? `fly -t local set-pipeline -p ${name} -c ${configFile} -l ${paramFile} -n`
+    : `fly -t local set-pipeline -p ${name} -c ${configFile} -n`;
   return exec(cmd, execOptions);
 }
 
