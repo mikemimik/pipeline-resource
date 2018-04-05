@@ -27,14 +27,10 @@ read.on('line', (input) => {
   const { target, teams } = payload.source;
 
   // INFO(mperrotte): params values
-  const {
-    method,
-    configFile,
-    paramsFile,
-    name,
-    nameFile,
-    team
-  } = payload.params;
+  const { method, name, team } = payload.params;
+  const configFile = payload.params.config_file;
+  const paramsFile = payload.params.params_file;
+  const nameFile = payload.params.name_file;
 
   const shouldStart = (payload.params.should_start)
     ? true
