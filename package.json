@@ -21,6 +21,11 @@
   ],
   "author": "Michael Perrotte <mike@mikecorp.ca>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/resolver/pipeline-resource.git"
+  },
+  "homepage": "https://bitbucket.org/resolver/pipeline-resource#readme",
   "dependencies": {
     "lodash": "^4.17.5",
     "uuid": "^3.2.1"
