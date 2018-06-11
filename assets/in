@@ -12,16 +12,11 @@ const read = readline.createInterface({
 let output;
 
 read.on('line', (input) => {
-  console.error(input);
-  console.error('args:', process.argv);
   const destination = process.argv[2];
   const payload = JSON.parse(input);
   const target = payload.source.target;
   const currentVersion = payload.version;
 
-  // TESTING(mperrotte): listing out what's in the destination directory
-  const ls = fs.readdirSync(destination, 'utf8');
-  console.error('ls (destination):', ls);
   output = {
     version: currentVersion,
     metadata: [
@@ -31,8 +26,6 @@ read.on('line', (input) => {
 });
 
 read.on('close', () => {
-  // TODO(mperrotte): return a list of all pipelines for a given team
-  // TODO(mperrotte): document that `- get: pipeline-resource` will need params
   console.log(JSON.stringify(output));
   process.exit(0);
 });

@@ -12,6 +12,5 @@ read.on('line', (input) => {
 });
 
 read.on('close', () => {
-  console.log(JSON.stringify([]));
   process.exit(0);
 });
