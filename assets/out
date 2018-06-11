@@ -16,8 +16,6 @@ let output;
 read.on('line', (input) => {
   const destination = process.argv[2];
   const payload = JSON.parse(input);
-
-  console.error('Checking required params');
   
   // INFO(mperrotte): source values
   const { target, teams } = payload.source;
