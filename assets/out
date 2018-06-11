@@ -19,9 +19,6 @@ read.on('line', (input) => {
 
   console.error('Checking required params');
   
-  // TESTING(mperrotte): listing out what's in the destination directory
-  const ls = fs.readdirSync(destination, 'utf8');
-
   // INFO(mperrotte): source values
   const { target, teams } = payload.source;
 
