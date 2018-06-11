@@ -12,6 +12,7 @@ read.on('line', (input) => {
 });
 
 read.on('close', () => {
+  // INFO(jlhirondelle): This console log is necessary functionality
   console.log(JSON.stringify([]));
   process.exit(0);
 });

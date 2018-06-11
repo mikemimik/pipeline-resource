@@ -14,15 +14,9 @@ const read = readline.createInterface({
 let output;
 
 read.on('line', (input) => {
-  console.error(input);
-  console.error('args:', process.argv);
   const destination = process.argv[2];
   const payload = JSON.parse(input);
-
-  // TESTING(mperrotte): listing out what's in the destination directory
-  const ls = fs.readdirSync(destination, 'utf8');
-  console.error('ls (destination):', ls);
-
+  
   // INFO(mperrotte): source values
   const { target, teams } = payload.source;
 
