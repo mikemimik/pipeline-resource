@@ -148,7 +148,7 @@ read.on('close', () => {
 const execOptions = { encoding: 'utf8' };
 
 function login (target, username, password, team) {
-  const cmd = `fly -t local login -c ${target} -u ${username} -p ${password} -n ${team}`;
+  const cmd = `fly -t local login -c ${target} -u ${username} -p ${password} -n ${team} --insecure`;
   return exec(cmd, execOptions);
 }
 
