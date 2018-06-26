@@ -121,7 +121,7 @@ read.on('line', (input) => {
     case 'update':
       break;
     default:
-      console.error('method param unknown');
+      console.error('[params.method]: invalid');
       process.exit(1);
   }
 
