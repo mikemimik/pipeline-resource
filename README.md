@@ -20,6 +20,8 @@ It can create, update, and delete pipelines.
 * `config_file`: _Required_. The path to a pipeline config yaml file.
 * `params_file`: _Optional_. The path to the pipeline params yaml file. (Note: if no params file is needed, then this parameter must explicitly be set to `false`.)
 * `should_start`: _Optional_. _Default `true`_
+* `should_expose`: _Optional_. _Default `false`_
+
 #### Selection
 The `name` and `name_file` parameters are used to name and identify the pipeline. If you are creating a new pipeline this will become the name of the pipeline, or if you are updating/deleting a pipeline this parameter is used to identify the pipeline. You can not set both of these properties, it is either one or the other.
 
@@ -125,6 +127,7 @@ plan:
   params:
     method: create
     should_start: true
+    should_expose: true
     team: main
     config_file: workspace/some-pipeline.yml
     params_file: false

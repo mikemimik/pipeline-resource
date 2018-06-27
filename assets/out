@@ -16,7 +16,7 @@ let output;
 read.on('line', (input) => {
   const destination = process.argv[2];
   const payload = JSON.parse(input);
-  
+
   // INFO(mperrotte): source values
   const { target, teams } = payload.source;
 
@@ -25,6 +25,7 @@ read.on('line', (input) => {
   const configFile = payload.params.config_file;
   const paramsFile = payload.params.params_file;
   const nameFile = payload.params.name_file;
+  const shouldExpose = payload.params.should_expose;
 
   const shouldStart = (payload.params.should_start)
     ? true
@@ -97,9 +98,12 @@ read.on('line', (input) => {
         if (paramsFile) {
           create(pipelineName, `${destination}/${configFile}`, `${destination}/${paramsFile}`);
         } else {
+          // INFO(mperrotte): passing 'falsy' `paramsFile` in to function
           create(pipelineName, `${destination}/${configFile}`, paramsFile);
         }
-        expose(pipelineName);
+        if (shouldExpose) {
+          expose(pipelineName);
+        }
 
         if (shouldStart === 'true' || shouldStart === true) {
           start(pipelineName);
@@ -135,7 +139,8 @@ read.on('line', (input) => {
       { name: 'target', value: target },
       { name: 'team', value: team },
       { name: 'pipeline-name', value: pipelineName },
-      { name: 'shouldStart', value: shouldStart.toString() }
+      { name: 'shouldStart', value: shouldStart.toString() },
+      { name: 'expose', value: shouldExpose.toString() }
     ]
   };
 });
