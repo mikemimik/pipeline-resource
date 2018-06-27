@@ -6,6 +6,7 @@ It can create, update, and delete pipelines.
 # Source Configuration
 * `target`: _Required_. The `uri` to the concourse server. The same value you would pass to a `fly` command. (eg. `http://{ip-address | domain}:{port}`)
 * `teams`: _Required_. Array of `team` objects. Contains `name`, `username`, and `password` for the concourse team.
+* `fly_version`: _Optional_. _Default `3.14.1`._ The explicit version of the fly-cli to use. If this value is set, the resource **will not** attempt to run `fly sync`.
 
 # Behavior
 
@@ -69,6 +70,19 @@ resources:
     - name: other_team
       username: other_concourse
       password: other_changeme
+```
+
+```
+resources:
+- name: pipeline-generator
+  type: pipeline-resource
+  source:
+    target: http://localhost:8080
+    fly_version: 3.11.0
+    teams:
+    - name: main
+      username: concourse
+      password: changeme
 ```
 
 #### Plan usage
